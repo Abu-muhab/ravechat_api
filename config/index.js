@@ -9,6 +9,12 @@ const config = {
   jwt: {
     secret: process.env.SECRET,
     expiresIn: process.env.JWT_EXPIRATION
+  },
+  oAuth: {
+    google: {
+      clientID: process.env.GOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    }
   }
 }
 
