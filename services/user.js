@@ -6,14 +6,14 @@ const userService = class UserService {
     this.UserModel = UserModel
   }
 
-  async createUser ({ email, password }) {
+  async createUser ({ email, password, googleId }) {
     const existingUser = await this.UserModel.findOne({ email })
 
     if (existingUser) {
       throw Error('User Already exists')
     }
 
-    const newUser = new this.UserModel({ email, password })
+    const newUser = new this.UserModel({ email, password, googleId })
 
     await newUser.save()
 
@@ -41,6 +41,14 @@ const userService = class UserService {
     user = user.toJSON()
     delete user.password
     return { user, authToken }
+  }
+
+  async findUserByGoogleIdOrEmail (email, googleId) {
+    let user = await this.UserModel.findOne({ googleId }).select('-password')
+    if (!user) {
+      user = await this.UserModel.findOne({ email })
+    }
+    return user
   }
 }
 

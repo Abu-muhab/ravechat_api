@@ -2,10 +2,15 @@ const express = require('express')
 const http = require('http')
 const cors = require('cors')
 const config = require('./config')
+const passportConfig = require('./config/passport')
 const mongoose = require('mongoose')
+const passport = require('passport')
 
 const apiRouter = require('./routes/api')
 const authRouter = require('./routes/auth')
+
+// configure passport
+passportConfig(passport)
 
 // connect to db
 mongoose.connect(
@@ -24,6 +29,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(passport.initialize())
 
 app.use('/api', apiRouter)
 app.use('/auth', authRouter)
