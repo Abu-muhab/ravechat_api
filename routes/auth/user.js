@@ -1,7 +1,6 @@
 const { Router } = require('express')
 const usersAuthController = require('../../controllers/auth/user')
 const { body } = require('express-validator')
-const passport = require('passport')
 
 const router = Router()
 
@@ -15,7 +14,11 @@ router.post('/signup', [
   body('password').notEmpty()
 ], usersAuthController.signUp)
 
-router.get('/snapchat', (req, res, next) => {
+router.post('/snapchat', [
+  body('snapId').notEmpty()
+], usersAuthController.snapchatAuth)
+
+router.get('/snapchat-redirect', (req, res, next) => {
   res.status(200).json({
     status: true
   })

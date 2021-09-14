@@ -6,20 +6,37 @@ const userService = class UserService {
     this.UserModel = UserModel
   }
 
-  async createUser ({ email, password, googleId }) {
+  async createUser ({ email, password }) {
     const existingUser = await this.UserModel.findOne({ email })
 
     if (existingUser) {
       throw Error('User Already exists')
     }
 
-    const newUser = new this.UserModel({ email, password, googleId })
+    const newUser = new this.UserModel({ email, password })
 
     await newUser.save()
 
     const { authToken } = await this.login({ email, password })
 
     return { user: newUser, authToken }
+  }
+
+  async authenticateWithSnapchat ({ avatarUrl, displayName, snapId }) {
+    let user = await this.UserModel.findOne({ snapId }).select('-password')
+
+    if (!user) {
+      if (displayName === undefined || avatarUrl === undefined) {
+        throw Error('Missing params')
+      }
+      user = new this.UserModel({ avatarUrl, displayName, snapId })
+      await user.save()
+    }
+
+    const authToken = jwt.sign({
+      id: user.id
+    }, config.jwt.secret, { expiresIn: config.jwt.expiresIn })
+    return { user, authToken }
   }
 
   async login ({ email, password }) {
@@ -34,7 +51,6 @@ const userService = class UserService {
     }
 
     const authToken = jwt.sign({
-      email: user.email,
       id: user.id
     }, config.jwt.secret, { expiresIn: config.jwt.expiresIn })
 

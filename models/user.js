@@ -5,15 +5,26 @@ const userSchema = new Schema(
   {
     email: {
       type: String,
-      required: true,
       unique: true,
       trim: true
     },
-    password: {
+    snapId: {
       type: String,
-      required: true
+      unique: true,
+      trim: true
     },
-    googleId: String
+    avatarUrl: {
+      type: String,
+      unique: true,
+      trim: true
+    },
+    displayName: {
+      type: String,
+      trim: true
+    },
+    password: {
+      type: String
+    }
   },
   { timestamps: true })
 
@@ -25,6 +36,10 @@ userSchema.pre('save', async function (next) {
   const user = this
 
   if (!user.isModified('password')) {
+    return next()
+  }
+
+  if (!user.password) {
     return next()
   }
 
