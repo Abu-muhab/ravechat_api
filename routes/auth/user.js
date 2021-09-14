@@ -15,6 +15,12 @@ router.post('/signup', [
   body('password').notEmpty()
 ], usersAuthController.signUp)
 
+router.get('/snapchat', (req, res, next) => {
+  res.status(200).json({
+    status: true
+  })
+})
+
 // router.get('/google', passport.authenticate('google', {
 //   session: false,
 //   scope: ['profile', 'email']
