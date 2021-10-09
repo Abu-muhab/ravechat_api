@@ -6,14 +6,29 @@ const userService = class UserService {
     this.UserModel = UserModel
   }
 
-  async createUser ({ email, password }) {
+  async getUniqueUserName (name) {
+    name = '@' + name.trim().split(' ')[0].toLowerCase()
+    let existingUser = await this.UserModel.findOne({ userName: name })
+    if (!existingUser) return name.toLowerCase()
+    let randomName
+    while (randomName === undefined) {
+      const numberToAppend = Math.floor(Math.random() * 100000) + 1
+      existingUser = await this.UserModel.findOne({ userName: name + String(numberToAppend) })
+      if (!existingUser) {
+        randomName = name + String(numberToAppend)
+      }
+    }
+    return randomName.toLowerCase()
+  }
+
+  async createUser ({ email, name, password }) {
     const existingUser = await this.UserModel.findOne({ email })
 
     if (existingUser) {
       throw Error('User Already exists')
     }
 
-    const newUser = new this.UserModel({ email, password })
+    const newUser = new this.UserModel({ email, password, userName: await this.getUniqueUserName(name) })
 
     await newUser.save()
 
@@ -29,7 +44,7 @@ const userService = class UserService {
       if (displayName === undefined || avatarUrl === undefined) {
         throw Error('Missing params')
       }
-      user = new this.UserModel({ avatarUrl, displayName, snapId })
+      user = new this.UserModel({ avatarUrl, displayName, snapId, userName: await this.getUniqueUserName(displayName) })
       await user.save()
     }
 

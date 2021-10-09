@@ -2,7 +2,7 @@ const express = require('express')
 const http = require('http')
 const cors = require('cors')
 const config = require('./config')
-const passportConfig = require('./config/passport')
+// const passportConfig = require('./config/passport')
 const mongoose = require('mongoose')
 const passport = require('passport')
 
@@ -10,7 +10,7 @@ const apiRouter = require('./routes/api')
 const authRouter = require('./routes/auth')
 
 // configure passport
-passportConfig(passport)
+// passportConfig(passport)
 
 // connect to db
 mongoose.connect(

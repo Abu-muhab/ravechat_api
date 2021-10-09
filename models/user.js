@@ -10,17 +10,20 @@ const userSchema = new Schema(
     },
     snapId: {
       type: String,
-      unique: true,
       trim: true
     },
     avatarUrl: {
       type: String,
-      unique: true,
       trim: true
     },
     displayName: {
       type: String,
       trim: true
+    },
+    userName: {
+      type: String,
+      trim: true,
+      unique: true
     },
     password: {
       type: String

@@ -11,7 +11,8 @@ router.post('/login', [
 
 router.post('/signup', [
   body('email').isEmail().normalizeEmail(),
-  body('password').notEmpty()
+  body('password').notEmpty(),
+  body('name').notEmpty()
 ], usersAuthController.signUp)
 
 router.post('/snapchat', [
