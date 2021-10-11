@@ -5,7 +5,7 @@ exports.sendChat = new MessageHandler('new-chat', (message) => {
   console.log(message)
   chatEventBus.next({
     type: 'new-chat',
-    targets: [message.userId],
+    targets: [message.userName],
     payload: {
       message: message.message
     }

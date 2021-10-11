@@ -1,10 +1,11 @@
 const SocketRouter = require('../../utils/socket-router')
 const chatHanlders = require('../../handlers/chat')
 const MessageHandlers = require('../../utils/message-handlers')
+const isAuth = require('../../middlewares/sockets/isAuth')
 
 const chatRouter = new SocketRouter()
 
-chatRouter.use('/chat', [], (socket) => {
+chatRouter.use('/chat', [isAuth], (socket) => {
   socket.on('message', message => {
     console.log(message)
     const handlers = new MessageHandlers({
@@ -15,10 +16,6 @@ chatRouter.use('/chat', [], (socket) => {
     } catch (err) {
       console.log(err.message)
     }
-  })
-
-  socket.on('connection', () => {
-    console.log('client connected')
   })
 })
 
