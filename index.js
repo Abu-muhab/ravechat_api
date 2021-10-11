@@ -8,6 +8,10 @@ const passport = require('passport')
 
 const apiRouter = require('./routes/api')
 const authRouter = require('./routes/auth')
+const { Server } = require('socket.io')
+const chatEventBus = require('./eventbus/chat')
+
+const chatSocketRouter = require('./routes/socket/chat')
 
 // configure passport
 // passportConfig(passport)
@@ -26,6 +30,8 @@ mongoose.connect(
 )
 
 const app = express()
+const server = http.createServer(app)
+const io = new Server(server)
 
 app.use(cors())
 app.use(express.json())
@@ -33,6 +39,19 @@ app.use(passport.initialize())
 
 app.use('/api', apiRouter)
 app.use('/auth', authRouter)
+
+// bind socket routes
+chatSocketRouter.bind(io)
+
+// bus event subcriptions
+chatEventBus.subscribe(message => {
+  message.targets.forEach(target => {
+    io.of('/chat').to(target).emit('message', {
+      type: message.type,
+      payload: message.payload
+    })
+  })
+})
 
 // error handler
 app.use((err, req, res, next) => {
@@ -43,8 +62,6 @@ app.use((err, req, res, next) => {
   })
 })
 
-const server = http.createServer(app)
-
-server.listen(config.port, () => {
+server.listen(config.port, '192.168.43.91', () => {
   console.log(`Server running on port ${config.port}`)
 })
