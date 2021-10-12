@@ -81,6 +81,31 @@ const userService = class UserService {
     }
     return user
   }
+
+  async findUser ({ page, limit, query }) {
+    if (page === undefined || page < 0) {
+      page = 1
+    }
+
+    if (limit === undefined || limit < 1) {
+      limit = 10
+    }
+
+    const queryObject = { $or: [{ userName: { $regex: new RegExp(query, 'i') } }, { displayName: { $regex: new RegExp(query, 'i') } }] }
+
+    const totalSearchCount = await this.UserModel.countDocuments(queryObject)
+
+    const users = await this.UserModel
+      .find(queryObject).skip((page - 1) * limit)
+      .limit(limit)
+
+    return {
+      hasNextPage: limit * page < totalSearchCount,
+      users: users,
+      totalItems: totalSearchCount,
+      lastPage: Math.ceil(totalSearchCount / limit)
+    }
+  }
 }
 
 module.exports = userService
