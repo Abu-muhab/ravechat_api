@@ -6,6 +6,7 @@ dotenv.config({ path: path.resolve(__dirname, '../config.env') })
 const config = {
   dbUrl: process.env.DB_URL,
   port: process.env.PORT,
+  env: process.env.ENV ?? 'prod',
   jwt: {
     secret: process.env.SECRET,
     expiresIn: process.env.JWT_EXPIRATION

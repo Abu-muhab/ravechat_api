@@ -4,11 +4,16 @@ class MessageHandlers {
   }
 
   handle (message) {
-    if (!this.handlers[message.type]) {
+    let handler
+    this.handlers.forEach(element => {
+      if (element.type === message.type) {
+        handler = element
+      }
+    })
+    if (handler === undefined) {
       throw new Error('No handler found for this message')
     }
-
-    this.handlers[message.type].handle(message)
+    handler.handle(message.message)
   }
 }
 

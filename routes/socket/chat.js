@@ -6,11 +6,15 @@ const isAuth = require('../../middlewares/sockets/isAuth')
 const chatRouter = new SocketRouter()
 
 chatRouter.use('/chat', [isAuth], (socket) => {
+  socket.join(socket.userName)
   socket.on('message', message => {
-    console.log(message)
-    const handlers = new MessageHandlers({
-      [chatHanlders.sendChat.type]: chatHanlders.sendChat
-    })
+    const handlers = new MessageHandlers([
+      chatHanlders.sendChat
+    ])
+
+    if (typeof message !== 'object') {
+      message = JSON.parse(message)
+    }
     try {
       handlers.handle(message)
     } catch (err) {
