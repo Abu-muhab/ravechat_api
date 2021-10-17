@@ -9,12 +9,20 @@ const passport = require('passport')
 const apiRouter = require('./routes/api')
 const authRouter = require('./routes/auth')
 const { Server } = require('socket.io')
-const chatEventBus = require('./eventbus/chat')
 
+const chatEventBus = require('./eventbus/chat')
 const chatSocketRouter = require('./routes/socket/chat')
+
+const admin = require('firebase-admin')
+const serviceAccount = require('./ravechat-39c2e-firebase-adminsdk-zm3mi-59da3e9cf8.json')
 
 // configure passport
 // passportConfig(passport)
+
+// initialize firebase admin
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+})
 
 // connect to db
 mongoose.connect(

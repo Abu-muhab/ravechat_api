@@ -5,6 +5,7 @@ const User = require('../../models/user')
 const isAuth = async (socket, next) => {
   try {
     const authToken = socket.handshake.auth.authToken
+    const fcmToken = socket.handshake.auth.fcmToken
 
     if (!authToken) {
       return next(new Error('No api key provided'))
@@ -21,6 +22,11 @@ const isAuth = async (socket, next) => {
     }
 
     const user = await User.findById(decodedToken.id)
+
+    // save or update fcmToken to db
+    user.fcmToken = fcmToken
+    user.save()
+
     socket.userId = decodedToken.id
     socket.userName = user.userName
     next()

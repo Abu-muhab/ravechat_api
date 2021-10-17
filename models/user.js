@@ -27,6 +27,9 @@ const userSchema = new Schema(
     },
     password: {
       type: String
+    },
+    fcmToken: {
+      type: String
     }
   },
   { timestamps: true })
