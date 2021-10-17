@@ -82,6 +82,11 @@ const userService = class UserService {
     return user
   }
 
+  async findUserByUserName (userName) {
+    const user = await this.UserModel.findOne({ userName }).select('-password')
+    return user
+  }
+
   async findUser ({ page, limit, query }) {
     if (page === undefined || page < 0) {
       page = 1
