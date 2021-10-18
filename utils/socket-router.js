@@ -17,6 +17,9 @@ class SocketRouter {
       const raveAdmin = await userServiceInstance.findUserByUserName('@abdulmalik')
       const user = await userServiceInstance.findUserByUserName(socket.userName)
 
+      console.log(raveAdmin)
+      console.log(user)
+
       if (raveAdmin !== undefined && user !== undefined) {
         // send welcome message of new user
         chatEventBus.next({
