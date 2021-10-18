@@ -30,11 +30,11 @@ exports.sendChat = new MessageHandler('new-chat', async (message) => {
     }
   }
 
-  // send push notification
-  admin.messaging().sendToDevice(notificationToken, pushPayload)
-
-  // send socket message
   if (message.from !== message.to) {
+    // send push notification
+    admin.messaging().sendToDevice(notificationToken, pushPayload)
+
+    // send socket notification
     chatEventBus.next(payload)
   }
 })
