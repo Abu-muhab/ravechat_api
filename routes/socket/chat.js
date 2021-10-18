@@ -5,6 +5,7 @@ const isAuth = require('../../middlewares/sockets/isAuth')
 const { userServiceInstance } = require('../../services/index')
 const chatEventBus = require('../../eventbus/chat')
 const { v4 } = require('uuid')
+const admin = require('firebase-admin')
 
 const chatRouter = new SocketRouter()
 
@@ -14,10 +15,11 @@ chatRouter.use('/chat', [isAuth], async (socket) => {
   const raveAdmin = await userServiceInstance.findUserByUserName('@abdulmalik')
   const user = await userServiceInstance.findUserByUserName(socket.userName)
 
-  if (raveAdmin !== undefined && user !== undefined) {
-    // send welcome message if new user
-    if (user.newUser === true) {
-      chatEventBus.next({
+  // send welcome message if new user
+  if (raveAdmin !== undefined && user !== undefined && user.newUser === true) {
+    const messageId = v4()
+    const payload = {
+      message_details: JSON.stringify({
         type: 'new-chat',
         senderDetails: raveAdmin,
         targets: [socket.userName],
@@ -26,27 +28,38 @@ chatRouter.use('/chat', [isAuth], async (socket) => {
           from: raveAdmin.userName,
           to: socket.userName,
           time: new Date().toISOString(),
-          id: v4()
+          id: messageId
         }
       })
-
-      // message to myself
-      chatEventBus.next({
-        type: 'new-chat',
-        senderDetails: user,
-        targets: [raveAdmin.userName],
-        message: {
-          content: 'Hey, i just joined ravechat',
-          from: user.userName,
-          to: raveAdmin.userName,
-          time: new Date().toISOString(),
-          id: v4()
-        }
-      })
-
-      user.newUser = false
-      user.save()
     }
+
+    // push notification
+    const pushPayload = {
+      data: {
+        message_details: JSON.stringify(payload)
+      }
+    }
+    admin.messaging().sendToDevice(user.fcmToken, pushPayload)
+
+    // socket notification
+    chatEventBus.next(payload)
+
+    // message to myself
+    chatEventBus.next({
+      type: 'new-chat',
+      senderDetails: user,
+      targets: [raveAdmin.userName],
+      message: {
+        content: 'Hey, i just joined ravechat',
+        from: user.userName,
+        to: raveAdmin.userName,
+        time: new Date().toISOString(),
+        id: v4()
+      }
+    })
+
+    user.newUser = false
+    user.save()
   }
 
   socket.on('message', message => {

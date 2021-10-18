@@ -18,26 +18,25 @@ exports.sendChat = new MessageHandler('new-chat', async (message) => {
   const messageId = v4()
 
   const payload = {
-    data: {
-      message_details: JSON.stringify({
-        type: 'new-chat',
-        senderDetails: sender,
-        targets: [message.to],
-        message: Object.assign(message, { id: messageId })
-      })
-    }
-  }
-
-  // send push notification
-  admin.messaging().sendToDevice(notificationToken, payload)
-
-  // send socket message
-  if (message.from !== message.to) {
-    chatEventBus.next({
+    message_details: JSON.stringify({
       type: 'new-chat',
       senderDetails: sender,
       targets: [message.to],
       message: Object.assign(message, { id: messageId })
     })
+  }
+
+  const pushPayload = {
+    data: {
+      message_details: JSON.stringify(payload)
+    }
+  }
+
+  // send push notification
+  admin.messaging().sendToDevice(notificationToken, pushPayload)
+
+  // send socket message
+  if (message.from !== message.to) {
+    chatEventBus.next(payload)
   }
 })
