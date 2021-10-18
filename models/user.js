@@ -30,6 +30,10 @@ const userSchema = new Schema(
     },
     fcmToken: {
       type: String
+    },
+    newUser: {
+      type: Boolean,
+      default: true
     }
   },
   { timestamps: true })
