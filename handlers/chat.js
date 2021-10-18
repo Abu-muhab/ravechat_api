@@ -29,7 +29,7 @@ exports.sendChat = new MessageHandler('new-chat', async (message) => {
   }
 
   // send push notification
-  await admin.messaging().sendToDevice(notificationToken, payload)
+  admin.messaging().sendToDevice(notificationToken, payload)
 
   // send socket message
   if (message.from !== message.to) {

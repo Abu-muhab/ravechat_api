@@ -28,7 +28,7 @@ const userService = class UserService {
       throw Error('User Already exists')
     }
 
-    const newUser = new this.UserModel({ email, password, userName: await this.getUniqueUserName(name) })
+    const newUser = new this.UserModel({ email, password, displayName: name.split(' ')[0], userName: await this.getUniqueUserName(name) })
 
     await newUser.save()
 
