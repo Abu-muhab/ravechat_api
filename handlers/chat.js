@@ -18,12 +18,10 @@ exports.sendChat = new MessageHandler('new-chat', async (message) => {
   const messageId = v4()
 
   const payload = {
-    message_details: JSON.stringify({
-      type: 'new-chat',
-      senderDetails: sender,
-      targets: [message.to],
-      message: Object.assign(message, { id: messageId })
-    })
+    type: 'new-chat',
+    senderDetails: sender,
+    targets: [message.to],
+    message: Object.assign(message, { id: messageId })
   }
 
   const pushPayload = {

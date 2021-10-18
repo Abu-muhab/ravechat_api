@@ -17,24 +17,22 @@ chatRouter.use('/chat', [isAuth], async (socket) => {
 
   // send welcome message if new user
   if (raveAdmin !== undefined && user !== undefined && user.newUser === true) {
-    const messageId = v4()
-    const payload = {
-      message_details: JSON.stringify({
-        type: 'new-chat',
-        senderDetails: raveAdmin,
-        targets: [socket.userName],
-        message: {
-          content: 'Hello, Welcome to rave chat!',
-          from: raveAdmin.userName,
-          to: socket.userName,
-          time: new Date().toISOString(),
-          id: messageId
-        }
-      })
+    let messageId = v4()
+    let payload = {
+      type: 'new-chat',
+      senderDetails: raveAdmin,
+      targets: [socket.userName],
+      message: {
+        content: 'Hello, Welcome to rave chat!',
+        from: raveAdmin.userName,
+        to: socket.userName,
+        time: new Date().toISOString(),
+        id: messageId
+      }
     }
 
     // push notification
-    const pushPayload = {
+    let pushPayload = {
       data: {
         message_details: JSON.stringify(payload)
       }
@@ -44,8 +42,10 @@ chatRouter.use('/chat', [isAuth], async (socket) => {
     // socket notification
     chatEventBus.next(payload)
 
+    // :::::::::::::::::::::::::::::::::::::::::::::::::
     // message to myself
-    chatEventBus.next({
+    messageId = v4()
+    payload = {
       type: 'new-chat',
       senderDetails: user,
       targets: [raveAdmin.userName],
@@ -54,9 +54,18 @@ chatRouter.use('/chat', [isAuth], async (socket) => {
         from: user.userName,
         to: raveAdmin.userName,
         time: new Date().toISOString(),
-        id: v4()
+        id: messageId
       }
-    })
+    }
+
+    pushPayload = {
+      data: {
+        message_details: JSON.stringify(payload)
+      }
+    }
+
+    admin.messaging().sendToDevice(raveAdmin.fcmToken, pushPayload)
+    chatEventBus.next(payload)
 
     user.newUser = false
     user.save()
